@@ -1,0 +1,11 @@
+#K: [-4.5209,-1.0513,-0.1536] #for lqr
+#K: [0.0,0.0,0.0] #for open loop test
+K: [-2.55,-0.17,-0.7] #for lqi diff
+ki : -0.3 #for differential drive controller PI
+kp : -0.0  #for differential drive controller PI
+KI : -0.0 #for lqi
+WMAX: 1
+N: -1.058234
+RAMP_lin: 0.09
+RAMP_ang: 0.5
+

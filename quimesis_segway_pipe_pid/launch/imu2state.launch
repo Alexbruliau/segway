@@ -1,0 +1,3 @@
+<launch>
+    <node name="imu2state" pkg="quimesis_segway_pipe_pid" type="imu2state" respawn="true" />
+</launch>

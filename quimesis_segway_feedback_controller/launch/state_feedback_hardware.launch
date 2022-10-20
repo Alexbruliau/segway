@@ -1,0 +1,6 @@
+<launch>
+    <rosparam command="load" file="$(find quimesis_segway_feedback_controller)/params/feedback.test.50Hz.yaml" />
+
+    <node name="segway_feedback_controller" pkg="quimesis_segway_feedback_controller" type="segway_state_feedback_controller" output="screen" />
+
+</launch>

@@ -1,0 +1,70 @@
+<launch>
+
+	<!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <!-- urdf xml robot description loaded on the Parameter Server, converting the xacro into a proper urdf file-->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find quimesis_segway_description)/urdf/segway.xacro'" />
+
+  <!-- joystick segway launch file -->
+  <!-- <include file="$(find quimesis_segway_joystick)/launch/segway_joy.launch" /> -->
+
+  <!-- pipe_pid segway launch file -->
+  <include file="$(find quimesis_segway_pipe_pid)/launch/imu2state.launch" ns="segway" />
+
+  <include file="$(find quimesis_segway_feedback_controller)/launch/state_feedback.launch" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find quimesis_segway_description)/worlds/segway.world"/>
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+	</include>
+
+
+<!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+	respawn="false" output="screen">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find quimesis_segway_description)/urdf/segway.xacro'" />
+    <remap from="/joint_states" to="/segway/joint_states" />
+  </node>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+<!--  <node name="segway_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+   args="-urdf -param robot_description -model segway" />-->
+
+   <node name="segway_spawn" pkg="gazebo_ros" type="spawn_model"
+       args="-z 0.2 -unpause -urdf -model segway -param robot_description" respawn="false" output="screen" />
+
+ <!-- <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop">
+    <remap from="cmd_vel" to="/cmd_vel"/>
+  </node> -->
+
+   <node name="odometry_node" pkg="quimesis_segway_odom" type="odometry_node" output="screen" />
+
+<node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
+    <param name="scan_height" value="1"/>
+    <param name="range_min" value="0.01"/>
+    <param name="range_max" value="30.0"/>
+    <param name="output_frame_id" value="camera"/>
+    <remap from="image" to="/camera/depth/image_raw"/>
+    <remap from="scan" to="/laser/scan"/>
+    <remap from="camera_info" to="/camera/depth/camera_info"/>
+
+  </node> 
+
+<node name="$(anon rviz)" pkg="rviz" type="rviz" output="screen"/>
+
+
+ <include file="$(find gmapping)/launch/slam_gmapping_pr2.launch" />  
+
+
+
+
+</launch>

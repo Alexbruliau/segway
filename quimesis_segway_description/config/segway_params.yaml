@@ -1,0 +1,18 @@
+motor :
+    rate : 50
+    ifname : "can0"
+    node_id : 5
+    right :
+        name : "right"
+        motor_idx : 1
+        scaling_factor : 980 # [/mm]
+        pwm_max : 127
+        current_max : 1.5 # [A]
+        speed_max : 11800 # [mm/s]
+    left :
+        name : "left"
+        motor_idx : 2
+        scaling_factor : 980 # [/mm]
+        pwm_max : 127
+        current_max : 1.5 # [A]
+        speed_max : 11800 # [mm/s]

@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<robot name="segway" xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+  <!-- SIZE BODY -->
+  <xacro:property name="width_body" value="0.200" />
+  <xacro:property name="height_body" value="0.255" />
+  <xacro:property name="depth_body" value="0.003" />
+
+  <!-- SIZE BOTTOM -->
+  <xacro:property name="width_bottom" value="0.265" />
+  <xacro:property name="height_bottom" value="0.050" />
+  <xacro:property name="depth_bottom" value="0.053" />
+  <xacro:property name="space_btwn_w_b" value="0.012" />
+
+  <!-- SIZE TOP -->
+  <xacro:property name="width_top" value="0.225" />
+  <xacro:property name="height_top" value="0.045" />
+  <xacro:property name="depth_top" value="0.070" />
+
+  <!-- SIZE BOX -->
+  <xacro:property name="width_box" value="0.190" />
+  <xacro:property name="height_box" value="0.148" />
+  <xacro:property name="depth_box" value="0.065" />
+
+  <!-- SIZE WHEEL -->
+  <xacro:property name="diam_wheel" value="0.125" />
+  <xacro:property name="len_wheel" value="0.03" />
+
+  <xacro:property name="pi" value="3.1415" />
+
+  <!-- Import all Gazebo-customization elements -->
+  <xacro:include filename="$(find quimesis_segway_description)/urdf/segway.gazebo" />
+
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+
+  <!-- INERTIAL -->
+  <xacro:macro name="default_inertial" params="mass">
+    <inertial>
+      <mass value="${mass}" />
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_inertial_with_origin" params="radius length mass *origin">
+     <inertial>
+       <mass value="${mass}" />
+       <xacro:insert_block name="origin" />
+       <inertia ixx="${0.0833333 * mass * (3 * radius * radius + length * length)}" ixy="0.0" ixz="0.0"
+         iyy="${0.0833333 * mass * (3 * radius * radius + length * length)}" iyz="0.0"
+         izz="${0.5 * mass * radius * radius}" />
+     </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="inertial_with_origin" params="radius length mass izz *origin">
+     <inertial>
+       <mass value="${mass}" />
+       <xacro:insert_block name="origin" />
+       <inertia ixx="${0.0833333 * mass * (3 * radius * radius + length * length)}" ixy="0.0" ixz="0.0"
+         iyy="${0.0833333 * mass * (3 * radius * radius + length * length)}" iyz="0.0"
+         izz="${izz}" />
+     </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="box_inertial_with_origin" params="x y z mass *origin">
+    <inertial>
+      <mass value="${mass}" />
+      <xacro:insert_block name="origin" />
+      <inertia ixx="${0.0833333 * mass * (y*y + z*z)}" ixy="0.0" ixz="0.0"
+        iyy="${0.0833333 * mass * (x*x + z*z)}" iyz="0.0"
+        izz="${0.0833333 * mass * (x*x + y*y)}" />
+    </inertial>
+  </xacro:macro>
+
+
+  <!-- ROBOT -->
+  <link name="base_link">
+    <gazebo>
+      <static>true</static>
+    </gazebo>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${depth_body} ${width_body} ${height_body}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${depth_body} ${width_body} ${height_body} "/>
+      </geometry>
+    </collision>
+    <xacro:box_inertial_with_origin x="${depth_body}" y="${width_body}" z="${height_body}" mass="0.200" >
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:box_inertial_with_origin >
+  </link>
+
+  <!-- <link name="inertia">
+     <inertial>
+      <mass value="3.4" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.2" ixy="0.0" ixz="0.0"
+        iyy="0.491" iyz="0.0"
+        izz="0.055" />
+    </inertial>
+  </link>
+
+  <joint name="inertia_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="inertia"/>
+      <origin xyz="${depth_bottom/2} 0 ${height_body/2}" rpy="0 0 0"/>
+    </joint> -->
+
+<!--
+  <link name="base_footprint">
+    <visual>
+      <geometry>
+        <sphere radius="0.01"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.00000001"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="base_footprint_joint" type="fixed">
+    <origin xyz="0 0 ${diam_wheel/2}" rpy="0 0 0"/>
+    <child link="base_link"/>
+    <parent link="base_footprint"/>
+  </joint>
+-->
+
+
+  <!-- Macro for the box, bottom, top and the battery -->
+  <xacro:macro name="container" params="prefix depth width height offset_x offset_y offset_z mass">
+    <link name="${prefix}_container">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${depth} ${width} ${height}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${depth} ${width} ${height}"/>
+        </geometry>
+      </collision>
+
+      <xacro:box_inertial_with_origin x="${depth}" y="${width}" z="${height}" mass="${mass}" >
+        <!-- <origin xyz="${offset_x} ${offset_y} ${offset_z}" rpy="0 0 0"/> -->
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+
+      </xacro:box_inertial_with_origin >
+
+    </link>
+
+    <joint name="${prefix}_container_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_container"/>
+      <origin xyz="${offset_x} ${offset_y} ${offset_z}" rpy="0 0 0"/>
+    </joint>
+
+  </xacro:macro>
+
+
+
+  <!-- BOTTOM -->
+  <xacro:container prefix="bottom" depth="${depth_bottom}" width="${width_bottom}" height="${height_bottom}"
+      offset_x="${depth_bottom/2}" offset_y="0" offset_z="${-(height_body/2+ height_bottom/2)}"
+      mass="1.420" />
+  <!-- TOP -->
+  <xacro:container prefix="top" depth="${depth_top}" width="${width_top}" height="${height_top}"
+    offset_x="${depth_top/2}" offset_y="0" offset_z="${height_body/2 + height_top/2}"
+    mass="0.350" />
+  <!-- BOX -->
+  <xacro:container prefix="box" depth="${depth_box}" width="${width_box}" height="${height_box}"
+     offset_x="${depth_box/2}" offset_y="0" offset_z="0"
+     mass="1.059" />
+
+   <!-- JointEffortControllerBATTERY -->
+   <xacro:container prefix="battery" depth="0.03" width="0.14" height="0.04"
+      offset_x="${-depth_bottom/4}" offset_y="0" offset_z="${-(height_body/2+ height_bottom/2)}"
+      mass="0.400" />
+
+
+  <!-- Wheel MACRO -->
+  <xacro:macro name="wheel" params="prefix reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${diam_wheel/2}" length="${len_wheel}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <geometry>
+          <cylinder radius="${diam_wheel/2}" length="${len_wheel}"/>
+        </geometry>
+      </collision>
+      <xacro:inertial_with_origin radius="${diam_wheel/2}" length="${len_wheel}" mass="0.188" izz="0.0006" >
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+      </xacro:inertial_with_origin >
+    </link>
+    <!-- friction -->
+
+    <gazebo reference="${prefix}_wheel">
+      <mu1 value="1e+16"/>
+      <mu2 value="1e+16"/>
+      <kp  value="100000000.0" />
+      <kd  value="1.0" />
+      <fdir1 value="1 0 0"/>
+    </gazebo>
+
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <axis xyz="0 1 0" rpy="0 1 0" />
+      <parent link="bottom_container"/>
+      <child link="${prefix}_wheel"/>
+      <origin xyz="0 ${reflect*(width_bottom/2 + len_wheel/2 + space_btwn_w_b)} 0" rpy="0 0 0"/>
+      <limit effort="0.3" velocity="12.7"/> <!-- velocity: rad/s -->
+    </joint>
+    <!-- This block connects the wheel joint to an actuator (motor), which informs both
+      simulation and visualization of the robot -->
+    <transmission name="${prefix}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel_joint">
+        <!-- <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface> -->
+        <!-- <hardwareInterface>EffortJointInterface</hardwareInterface>-->
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+
+      </joint>
+      <actuator name="${prefix}_wheel_motor">
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+         <!-- <mechanicalReduction>49</mechanicalReduction> -->
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+  <!-- WHEELs -->
+  <xacro:wheel prefix="left" reflect="-1" />
+  <xacro:wheel prefix="right" reflect="1" />
+
+
+
+
+  </robot>

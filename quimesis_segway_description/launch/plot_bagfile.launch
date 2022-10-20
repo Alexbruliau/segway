@@ -1,0 +1,12 @@
+<launch>
+
+  <node name="velocity" pkg="rqt_plot" type="rqt_plot" args="/orientation/state /velocity/linear/state  /velocity/linear/setpoint /velocity/linear/P /velocity/linear/I /orientation/setpoint" />
+  <node name="orientation" pkg="rqt_plot" type="rqt_plot" args="/orientation/state  /orientation/setpoint /orientation/P /orientation/D /orientation/control_effort   " />
+
+<!-- <node name="cmd" pkg="rqt_plot" type="rqt_plot" args="/left/cmd   " />
+<node name="feedback" pkg="rqt_plot" type="rqt_plot" args="/left/feedback " /> -->
+
+ <node name="velocity_filter" pkg="rqt_plot" type="rqt_plot" args="/velocity/linear/state /velocity/angular/state" />
+
+
+</launch>

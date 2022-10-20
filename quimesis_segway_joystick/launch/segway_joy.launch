@@ -1,0 +1,18 @@
+<launch>
+
+  <!-- joy node -->
+  <node respawn="true" pkg="joy"
+        type="joy_node" name="joy" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" />
+  </node>
+
+ <!-- Axes -->
+  <param name="axis_linear" value="1" type="double"/>
+  <param name="axis_angular" value="3" type="double"/>
+  <param name="scale_linear" value="0.4" type="double"/> <!-- max velocity setpoint  in m/s -->
+  <param name="scale_angular" value="1.0" type="double"/>
+
+  <node pkg="quimesis_segway_joystick" type="segway_joy" name="teleop" respawn="true" />
+
+</launch>

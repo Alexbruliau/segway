@@ -1,0 +1,35 @@
+<launch>
+
+	<!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  
+
+  <!-- joystick segway launch file -->
+ <include file="$(find quimesis_segway_joystick)/launch/segway_joy.launch" /> 
+
+  <!-- imu segway launch file -->
+  <include file="$(find rtimulib_ros)/launch/rtimulib_ros.launch" />
+
+
+<!-- put imu data to the appropriate topics -->
+  <include file="$(find quimesis_segway_pipe_pid)/launch/imu2state.launch" ns="segway" />
+
+
+
+<include file="$(find quimesis_segway_feedback_controller)/launch/state_feedback_hardware.launch" /> 
+
+
+  <!-- quimmotor launch file -->
+  <rosparam file="$(find quimesis_segway_description)/config/segway_params.yaml" command="load"/>
+  <node name="motor" pkg="quimesis_quimmotor" type="quimesis_quimmotor_node" />
+
+<!-- quimmotor print data 
+
+ <node name="print" pkg="print_topics" type="print_topics_balanced_node" /> -->
+
+</launch>
